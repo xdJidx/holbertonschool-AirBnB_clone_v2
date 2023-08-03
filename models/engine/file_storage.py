@@ -9,11 +9,6 @@ class FileStorage:
     __objects = {}
 
     @classmethod
-    def all(cls):
-        """Returns a dictionary of models currently in storage"""
-        return list(FileStorage.__objects.values())
-    
-    @staticmethod
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
         if cls is None:
