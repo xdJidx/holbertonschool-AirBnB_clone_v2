@@ -3,15 +3,17 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+
 
 class DBStorage:
     """This class manages the database storage"""
+
     __engine = None
     __session = None
 
     def __init__(self):
         """Instantiates a new DBStorage object"""
+        from models.base_model import Base
         user = os.environ.get('HBNB_MYSQL_USER')
         password = os.environ.get('HBNB_MYSQL_PWD')
         host = os.environ.get('HBNB_MYSQL_HOST')
@@ -25,6 +27,7 @@ class DBStorage:
     def all(self, cls=None):
         """Queries on the current database session"""
         from models import classes
+        from models.base_model import Base
         obj_dict = {}
         if cls:
             if isinstance(cls, str):
@@ -57,7 +60,8 @@ class DBStorage:
 
     def reload(self):
         """Creates all tables in the database and creates the current database session"""
-        from models import classes
+        #from models import classes
+        from models.base_model import Base
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
