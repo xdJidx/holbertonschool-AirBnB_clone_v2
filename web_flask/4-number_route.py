@@ -2,7 +2,7 @@
 """
 Add replace underscores with spaces.
 """
-from flask import Flask, abort
+from flask import Flask
 
 app = Flask(__name__)
 
@@ -34,8 +34,7 @@ def python_route(text):
 def number_route(n):
     if n.isdigit():
         return f"{n} is a number"
-    else:
-        return "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>\n"
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
