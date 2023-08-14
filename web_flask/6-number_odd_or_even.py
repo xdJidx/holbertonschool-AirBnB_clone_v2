@@ -56,7 +56,8 @@ def number_template(n):
 def number_odd_or_even_route(n):
     if isinstance(n, int):
         parity = "odd" if n % 2 else "even"
-        return render_template('6-number_odd_or_even.html', number=n, parity=parity)
+        return render_template(
+            '6-number_odd_or_even.html', number=n, parity=parity)
     else:
         return "Not Found", 404
 
