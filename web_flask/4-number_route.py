@@ -23,16 +23,15 @@ def c_route(text):
     return f"C {text}"
 
 
-@app.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
+@app.route('/python/', strict_slashes=False, defaults={'text': 'is cool'})
 @app.route('/python/<text>', strict_slashes=False)
-def python_route(text):
-    text = text.replace('_', ' ')
-    return f"Python {text}"
+def python(text):
+    return 'Python {}'.format(text.replace('_', ' '))
 
 
-@app.route('/number/<n>', strict_slashes=False)
-def number_route(n):
-    return "{} is a number".format(n)
+@app.route('/number/<int:n>', strict_slashes=False)
+def number(n):
+    return '{} is a number'.format(n)
 
 
 if __name__ == '__main__':
