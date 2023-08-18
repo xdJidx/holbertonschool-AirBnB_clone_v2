@@ -9,6 +9,7 @@ from models.city import City
 
 app = Flask(__name__)
 
+
 @app.teardown_appcontext
 def close_db(exception):
     storage.close()
