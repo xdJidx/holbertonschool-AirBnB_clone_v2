@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """This module defines the database storage"""
-import os
+from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
@@ -21,69 +21,78 @@ classes = {
 
 
 class DBStorage:
-    """This class manages the database storage"""
-
+    """
+    Creates database
+    """
     __engine = None
     __session = None
 
     def __init__(self):
-        """Instantiates a new DBStorage object"""
-        from models.base_model import Base
-        user = os.environ.get('HBNB_MYSQL_USER')
-        password = os.environ.get('HBNB_MYSQL_PWD')
-        host = os.environ.get('HBNB_MYSQL_HOST')
-        db = os.environ.get('HBNB_MYSQL_DB')
+        """
+        Start
+        """
+        user = getenv('HBNB_MYSQL_USER')
+        pwd = getenv('HBNB_MYSQL_PWD')
+        host = getenv('HBNB_MYSQL_HOST')
+        database = getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.
-                                      format(user, password, host, db),
+                                      format(user, pwd, host, database),
                                       pool_pre_ping=True)
-        if os.environ.get('HBNB_ENV') == 'test':
+
+        if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Queries on the current database session"""
-        obj_dict = {}
-
-        if cls:
-            if isinstance(cls, str):
-                cls = classes.get(cls, None)
-            if cls:
-                for obj in self.__session.query(cls).all():
-                    key = "{}.{}".format(type(obj).__name__, obj.id)
-                    obj_dict[key] = obj
+        """
+        Perf query on current database
+        Returns:
+            Dict with all objects accroding to cls args
+            Or everything if no args
+        """
+        objects_dict = {}
+        if cls != '':
+            objects = self.__session.query(cls)
         else:
-            for name, cls in classes.items():
-                if cls == Base:
-                    continue
-                for obj in self.__session.query(cls).all():
-                    key = "{}.{}".format(type(obj).__name__, obj.id)
-                    obj_dict[key] = obj
-        return obj_dict
+            objects = self.__session.query(Amenity)
+            objects += self.__session.query(City)
+            objects += self.__session.query(Place)
+            objects += self.__session.query(User)
+            objects += self.__session.query(Review)
+            objects += self.__session.query(State)
+        return {"{}.{}".format(obj.__class__.__name__, obj.id):
+                obj for obj in objects}
 
     def new(self, obj):
-        """Adds the object to the current database session"""
+        """
+        Adds objects to curretn db session
+        """
         self.__session.add(obj)
 
     def save(self):
-        """Commits all changes of the current database session"""
+        """
+        Commit all changes to current db session
+        """
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Deletes the object from the current database session"""
-        if obj is not None:
+        """
+        Delete obj
+        """
+        if obj:
             self.__session.delete(obj)
 
     def reload(self):
         """
-        Creates all tables in the database and creates the
-        current database session
+        Commit all changes in db after changings
         """
-        # from models import classes
-        from models.base_model import Base
-        Base.metadata.create_all(self.__engine)
+        self.__session = Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
-
-        self.__session = scoped_session(session_factory)
+        Session = scoped_session(session_factory)
+        self.__session = Session()
 
     def close(self):
+        """
+        Call
+        """
         self.__session.close()
