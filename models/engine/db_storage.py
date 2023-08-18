@@ -3,6 +3,21 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from models.base_model import Base
+from models.base_model import BaseModel
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
+
+
+classes = {
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
+    }
 
 
 class DBStorage:
@@ -26,9 +41,8 @@ class DBStorage:
 
     def all(self, cls=None):
         """Queries on the current database session"""
-        from models import classes
-        from models.base_model import Base
         obj_dict = {}
+
         if cls:
             if isinstance(cls, str):
                 cls = classes.get(cls, None)
